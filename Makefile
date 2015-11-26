@@ -1,8 +1,8 @@
 SRCDIR= src
 OBJDIR= obj
 CC =gcc -Wall
-CFLAGS= -I$(SRCDIR)
-LDFLAGS= -lwiringPi
+CFLAGS= -I$(SRCDIR) -g
+LDFLAGS= -lwiringPi -lpthread
 EXEC= jandroid
 SRC= $(wildcard $(SRCDIR)/*.c)
 OBJ= $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)

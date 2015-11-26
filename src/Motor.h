@@ -7,6 +7,7 @@ struct Motor
 	int PWM;
 	int IN1;
 	int IN2;
+	int speed;
 
 	bool inverted;
 };
