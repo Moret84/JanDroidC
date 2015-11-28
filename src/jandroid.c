@@ -52,24 +52,13 @@ void initPins(Motor* motors)
 
 void forward(Motor* motors)
 {
-	for(int i = AvD; i <= ArD; ++i)
-	{
-		if(motors[i].inverted)
-			digitalWrite(motors[i].IN1, 1);
-		else
-			digitalWrite(motors[i].IN2, 1);
-	}
+	setForward(motors);
 	go(motors);
 }
+
 void backward(Motor* motors)
 {
-	for(int i = AvD; i <= ArD; ++i)
-	{
-		if(motors[i].inverted)
-			digitalWrite(motors[i].IN2, 1);
-		else
-			digitalWrite(motors[i].IN1, 1);
-	}
+	setBackward(motors);
 	go(motors);
 }
 
@@ -104,4 +93,67 @@ void stopAll(Motor* motors)
 {
 	for(int i = AvD; i <= ArD; ++i)
 		stopMotor(motors[i]);
+}
+
+void reset(Motor* motors)
+{
+	for(int i = AvD; i <= ArD; ++i)
+	{
+		digitalWrite(motors[i].IN1, 0);
+		digitalWrite(motors[i].IN2, 0);
+	}
+}
+
+void setMotors(Motor* motors, int angle, int strength)
+{
+	if(strength == 0)
+	{
+		reset(motors);
+		stopAll(motors);
+	}
+	else
+	{
+		if(abs(angle) <= 90)
+		{
+			setForward(motors);
+			setSpeed(motors, strength, strength, strength, strength);
+		}
+
+		else
+		{
+			setBackward(motors);
+			setSpeed(motors, strength, strength, strength, strength);
+		}
+	}
+	go(motors);
+}
+
+void setSpeed(Motor* motors, int AvDs, int ArDs, int AvGs, int ArGs)
+{
+	motors[AvD].speed = AvDs;
+	motors[ArD].speed = ArDs;
+	motors[AvG].speed = AvGs;
+	motors[ArG].speed = ArGs;
+}
+
+void setForward(Motor* motors)
+{
+	for(int i = AvD; i <= ArD; ++i)
+	{
+		if(motors[i].inverted)
+			digitalWrite(motors[i].IN1, 1);
+		else
+			digitalWrite(motors[i].IN2, 1);
+	}
+}
+
+void setBackward(Motor* motors)
+{
+	for(int i = AvD; i <= ArD; ++i)
+	{
+		if(motors[i].inverted)
+			digitalWrite(motors[i].IN2, 1);
+		else
+			digitalWrite(motors[i].IN1, 1);
+	}
 }
