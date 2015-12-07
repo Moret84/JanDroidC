@@ -36,12 +36,9 @@ void initPins(Motor* motors)
 {
 	for(int i = AvD; i <= ArD; ++i)
 	{
-		//pinMode(motors[i].PWM, OUTPUT);
 		if(softPwmCreate(motors[i].PWM, 0, 100) != 0)
-		{
-			printf("%s\n", "ça pèse pas");
 			printf("%d\n", errno);
-		}
+
 		pinMode(motors[i].IN1, OUTPUT);
 		pinMode(motors[i].IN2, OUTPUT);
 
@@ -104,16 +101,16 @@ void reset(Motor* motors)
 	}
 }
 
-void setMotors(Motor* motors, int angle, int strength)
+void setMotors(Motor* motors, int x, int y)
 {
-	if(strength == 0)
+	if(y == 0)
 	{
 		reset(motors);
 		stopAll(motors);
 	}
 	else
 	{
-		if(abs(angle) <= 90)
+		/*if(abs(angle) <= 90)
 		{
 			setForward(motors);
 			setSpeed(motors, strength, strength, strength, strength);
@@ -123,7 +120,21 @@ void setMotors(Motor* motors, int angle, int strength)
 		{
 			setBackward(motors);
 			setSpeed(motors, strength, strength, strength, strength);
-		}
+		}*/
+		if(y > 0)
+			setForward(motors);
+		else
+			setBackward(motors);
+
+		int speed = abs(y); // y
+		int shift = abs(x); // x
+
+		if(x > 0)
+			setSpeed(motors, speed - shift, speed - shift, speed, speed);
+		else if (x < 0)
+			setSpeed(motors, speed, speed, speed - shift, speed - shift);
+		else
+			setSpeed(motors, speed, speed, speed, speed);
 	}
 	go(motors);
 }

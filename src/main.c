@@ -13,7 +13,7 @@ int main()
 	int sock = init_socket();
 	int csock = add_client(sock);
 
-	char command[9];
+	char command[10];
 	printf("%s\n", "Listening for command");
 
 	while((recv(csock, &command, sizeof(command), 0)) > 0)
