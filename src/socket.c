@@ -2,7 +2,9 @@
 
 int init_socket()
 {
-	int sock = socket(AF_INET, SOCK_STREAM, 0);
+	Socket sock = socket(AF_INET, SOCK_STREAM, 0);
+	char value = 1;
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value));
 
 	if(sock == INVALID_SOCKET)
 	{
@@ -46,15 +48,30 @@ int add_client(int socket)
 	return client_socket;
 }
 
-char* receive_command(int socket, int buffer_size)
+void listen_command(Socket client_socket, Motor* motors)
 {
-	char *command = malloc(buffer_size * sizeof(char));
+	int nb = 0, offset = 0, x = 0, y = 0;
+	signed char command[2];
 
-	if((recv(socket, &command, sizeof(command), 0)) < 0)
+	while(1)
 	{
-		perror("failed to receive");
-		exit(errno);
-	}
+		nb = recv(client_socket, &command[offset], sizeof(command) - offset, 0);
+		offset += nb;
+		if(nb == 0 || nb == -1)
+		{
+			shutdown(client_socket, SHUT_RDWR);
+			closesocket(client_socket);
+			return;
+		}
 
-	return command;
+		if(offset == 2)
+		{
+			x = command[0];
+			y = command[1];
+			printf("x: %d\n", x);
+			printf("y: %d\n", y);
+			setMotors(motors, x, y);
+			offset = 0;
+		}
+	}
 }

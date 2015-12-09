@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <jandroid.h>
 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
@@ -16,7 +17,8 @@
 
 typedef struct sockaddr_in sockaddr_in;
 typedef struct sockaddr sockaddr;
+typedef int Socket;
 
 int init_socket();
-int add_client(int socket);
-char* receive_command(int socket, int buffer_size);
+int add_client(Socket socket);
+void listen_command(Socket client_socket, Motor* motors);

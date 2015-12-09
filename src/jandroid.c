@@ -47,38 +47,10 @@ void initPins(Motor* motors)
 	}
 }
 
-void forward(Motor* motors)
-{
-	setForward(motors);
-	go(motors);
-}
-
-void backward(Motor* motors)
-{
-	setBackward(motors);
-	go(motors);
-}
-
 void go(Motor* motors)
 {
 	for(int i = AvD; i <= ArD; ++i)
 		softPwmWrite(motors[i].PWM, motors[i].speed);
-}
-
-void speedUp(Motor* motors)
-{
-	for(int i = AvD; i <= ArD && motors[i].speed <= 100; ++i)
-		softPwmWrite(motors[i].PWM, motors[i].speed += 25);
-}
-
-void speedDown(Motor* motors)
-{
-	for(int i = AvD; i <= ArD && motors[i].speed >= 0; ++i)
-	{
-		softPwmWrite(motors[i].PWM, motors[i].speed -= 25);
-		if(motors[i].speed == 0)
-			stopMotor(motors[i]);
-	}
 }
 
 void stopMotor(Motor motor)
@@ -110,17 +82,6 @@ void setMotors(Motor* motors, int x, int y)
 	}
 	else
 	{
-		/*if(abs(angle) <= 90)
-		{
-			setForward(motors);
-			setSpeed(motors, strength, strength, strength, strength);
-		}
-
-		else
-		{
-			setBackward(motors);
-			setSpeed(motors, strength, strength, strength, strength);
-		}*/
 		if(y > 0)
 			setForward(motors);
 		else
@@ -134,7 +95,7 @@ void setMotors(Motor* motors, int x, int y)
 		else if (x < 0)
 			setSpeed(motors, speed, speed, speed - shift, speed - shift);
 		else
-			setSpeed(motors, speed, speed, speed, speed);
+		setSpeed(motors, speed, speed, speed, speed);
 	}
 	go(motors);
 }
