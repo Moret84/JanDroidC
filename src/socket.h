@@ -21,4 +21,4 @@ typedef int Socket;
 
 int init_socket();
 int add_client(Socket socket);
-void listen_command(Socket client_socket, Motor* motors);
+void listen_command(Motor* motors, Socket client_socket);

@@ -32,7 +32,7 @@ int init_socket()
 	return sock;
 }
 
-int add_client(int socket)
+int add_client(Socket socket)
 {
 	sockaddr_in csin = { 0 };
 	socklen_t size = sizeof(csin);
@@ -48,10 +48,10 @@ int add_client(int socket)
 	return client_socket;
 }
 
-void listen_command(Socket client_socket, Motor* motors)
+void listen_command(Motor* motors, Socket client_socket)
 {
 	int nb = 0, offset = 0, x = 0, y = 0;
-	signed char command[2];
+	signed char command[3];
 
 	while(1)
 	{
@@ -64,13 +64,16 @@ void listen_command(Socket client_socket, Motor* motors)
 			return;
 		}
 
-		if(offset == 2)
+		if(offset == 3)
 		{
-			x = command[0];
-			y = command[1];
-			printf("x: %d\n", x);
-			printf("y: %d\n", y);
-			setMotors(motors, x, y);
+			switch(command[0])
+			{
+				case 'M':
+					printf("Motor command received: x: %d, y: %d\n", command[1], command[2]);
+					setMotors(motors, command[1], command[2]);
+					break;
+			}
+
 			offset = 0;
 		}
 	}
