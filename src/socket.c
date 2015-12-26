@@ -1,6 +1,6 @@
 #include <socket.h>
 
-int init_socket()
+Socket init_socket()
 {
 	Socket sock = socket(AF_INET, SOCK_STREAM, 0);
 	char value = 1;
@@ -32,7 +32,7 @@ int init_socket()
 	return sock;
 }
 
-int add_client(Socket socket)
+Socket add_client(Socket socket)
 {
 	sockaddr_in csin = { 0 };
 	socklen_t size = sizeof(csin);
@@ -48,9 +48,9 @@ int add_client(Socket socket)
 	return client_socket;
 }
 
-void listen_command(Motor* motors, Socket client_socket)
+void listen_command(Motor* motors, Servo* servos, Socket client_socket)
 {
-	int nb = 0, offset = 0, x = 0, y = 0;
+	int nb = 0, offset = 0;
 	signed char command[3];
 
 	while(1)
@@ -71,6 +71,10 @@ void listen_command(Motor* motors, Socket client_socket)
 				case 'M':
 					printf("Motor command received: x: %d, y: %d\n", command[1], command[2]);
 					setMotors(motors, command[1], command[2]);
+					break;
+				case 'C':
+					printf("Camera command received: x: %d, y: %d\n", command[1], command[2]);
+					moveCamera(servos, command[1], command[2]);
 					break;
 			}
 

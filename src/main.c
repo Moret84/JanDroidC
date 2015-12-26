@@ -1,21 +1,32 @@
 #include <jandroid.h>
-#include <socket.h>
-#include <string.h>
+#include <signal.h>
+
+JandroidStuff jandroid;
+
+void cleanup(int num)
+{
+	closesocket(jandroid.client_socket);
+	closesocket(jandroid.socket);
+	free(jandroid.motors);
+	free(jandroid.servos);
+}
 
 int main()
 {
-	Motor* motors = initMotors();
-	initPins(motors);
+	signal(SIGINT, &cleanup);
 
-	Socket sock = init_socket(), csock;
-	while((csock = add_client(sock)) > 0)
+	wiringPiSetup();
+	jandroid.motors = initMotors();
+	jandroid.servos = initServos();
+
+	jandroid.socket = init_socket();
+
+	while((jandroid.client_socket = add_client(jandroid.socket)) > 0)
 	{
 		printf("%s\n", "Listening for command");
-
-		listen_command(motors, csock);
+		listen_command(jandroid.motors, jandroid.servos, jandroid.client_socket);
 	}
-		closesocket(sock);
-		free(motors);
 
-		return 0;
+	cleanup(0);
+	return 0;
 }

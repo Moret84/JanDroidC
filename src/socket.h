@@ -19,6 +19,6 @@ typedef struct sockaddr_in sockaddr_in;
 typedef struct sockaddr sockaddr;
 typedef int Socket;
 
-int init_socket();
-int add_client(Socket socket);
-void listen_command(Motor* motors, Socket client_socket);
+Socket init_socket();
+Socket add_client(Socket socket);
+void listen_command(Motor* motors, Servo* servos, Socket client_socket);

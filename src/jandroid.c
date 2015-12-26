@@ -1,8 +1,7 @@
 #include <jandroid.h>
 
-Motor* initMotors()
+Motor* initMotors(void)
 {
-	wiringPiSetup () ;
 	Motor* motors = malloc(NBMOTOR * sizeof(Motor));
 
 	motors[ArG].PWM = 0;
@@ -29,11 +28,6 @@ Motor* initMotors()
 	motors[AvG].speed = 25;
 	motors[AvG].inverted = true;
 
-	return motors;
-}
-
-void initPins(Motor* motors)
-{
 	for(int i = AvD; i <= ArD; ++i)
 	{
 		if(softPwmCreate(motors[i].PWM, 0, 100) != 0)
@@ -42,9 +36,84 @@ void initPins(Motor* motors)
 		pinMode(motors[i].IN1, OUTPUT);
 		pinMode(motors[i].IN2, OUTPUT);
 
-		digitalWrite(motors[i].IN1, 0);
-		digitalWrite(motors[i].IN2, 0);
+		digitalWrite(motors[i].IN1, LOW);
+		digitalWrite(motors[i].IN2, LOW);
 	}
+
+	return motors;
+}
+
+Servo* initServos()
+{
+	Servo *servos = malloc(NBSERVO * sizeof(Servo));
+
+	servos[vertical] = 7;
+	servos[horizontal] = 17;
+
+	digitalWrite(servos[vertical], LOW);
+	digitalWrite(servos[horizontal], LOW);
+
+	softPwmCreate(servos[vertical], 0, 200);
+	softPwmCreate(servos[horizontal], 0, 200);
+
+	Pulse v = {.SERVO = servos[vertical], .LENGTH = 24, .NUMBER = 15};
+	Pulse h = {.SERVO = servos[horizontal], .LENGTH = 15, .NUMBER = 30};
+
+	pulseAServo((void*) &v);
+	pulseAServo((void*) &h);
+
+	return servos;
+}
+
+void launchPulse(void *args)
+{
+	Pulse *pulse = (Pulse *) args;
+	softPwmWrite(pulse->SERVO, pulse->LENGTH);
+	usleep(pulse->NUMBER * PULSE_WIDTH);
+	softPwmWrite(pulse->SERVO, 0);
+}
+
+void pulseAServo(void *args)
+{
+	pthread_t thread;
+	pthread_create(&thread, NULL, (void*) &launchPulse, args);
+	pthread_join(thread, NULL);
+}
+
+void moveCamera(Servo* servos, int x, int y)
+{
+	int absX = abs(x), absY = abs(y);
+
+	Pulse p = {.LENGTH = -1, .NUMBER = 1};
+
+	if(absX >= absY)
+	{
+		p.SERVO = servos[horizontal];
+
+		if(absX > 30)
+		{
+			if(x > 0)
+				p.LENGTH = 6;
+			else if(x < 0)
+				p.LENGTH = 24;
+		}
+	}
+
+	else
+	{
+		p.SERVO = servos[vertical];
+
+		if(absY > 30)
+		{
+			if(y > 0)
+				p.LENGTH = 24;
+			else if(y < 0)
+				p.LENGTH = 15;
+		}
+	}
+
+	if(p.LENGTH != -1)
+		pulseAServo((void*) &p);
 }
 
 void go(Motor* motors)
@@ -53,15 +122,10 @@ void go(Motor* motors)
 		softPwmWrite(motors[i].PWM, motors[i].speed);
 }
 
-void stopMotor(Motor motor)
-{
-	digitalWrite(motor.PWM, 0);
-}
-
 void stopAll(Motor* motors)
 {
 	for(int i = AvD; i <= ArD; ++i)
-		stopMotor(motors[i]);
+		digitalWrite(motors[i].PWM, 0);
 }
 
 void reset(Motor* motors)
@@ -87,8 +151,8 @@ void setMotors(Motor* motors, int x, int y)
 		else
 			setBackward(motors);
 
-		int speed = abs(y); // y
-		int shift = abs(x); // x
+		int shift = abs(x);
+		int speed = abs(y);
 
 		if(x > 0)
 			setSpeed(motors, speed - shift, speed - shift, speed, speed);
