@@ -1,0 +1,8 @@
+[Unit]
+Description=Jandroid
+
+[Service]
+ExecStart=/home/jan/JandroidC/jandroid
+
+[Install]
+WantedBy=multi-user.target

@@ -16,9 +16,9 @@ int main()
 	signal(SIGINT, &cleanup);
 
 	wiringPiSetup();
+
 	jandroid.motors = initMotors();
 	jandroid.servos = initServos();
-
 	jandroid.socket = init_socket();
 
 	while((jandroid.client_socket = add_client(jandroid.socket)) > 0)
