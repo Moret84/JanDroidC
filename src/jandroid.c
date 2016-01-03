@@ -59,25 +59,17 @@ Servo* initServos()
 	Pulse v = {.SERVO = servos[vertical], .LENGTH = 24, .NUMBER = 15};
 	Pulse h = {.SERVO = servos[horizontal], .LENGTH = 15, .NUMBER = 30};
 
-	pulseAServo((void*) &v);
-	pulseAServo((void*) &h);
+	launchPulse(&v);
+	launchPulse(&h);
 
 	return servos;
 }
 
-void launchPulse(void *args)
+void launchPulse(Pulse* pulse)
 {
-	Pulse *pulse = (Pulse *) args;
 	softPwmWrite(pulse->SERVO, pulse->LENGTH);
 	usleep(pulse->NUMBER * PULSE_WIDTH);
 	softPwmWrite(pulse->SERVO, 0);
-}
-
-void pulseAServo(void *args)
-{
-	pthread_t thread;
-	pthread_create(&thread, NULL, (void*) &launchPulse, args);
-	pthread_join(thread, NULL);
 }
 
 void moveCamera(Servo* servos, int x, int y)
@@ -113,7 +105,7 @@ void moveCamera(Servo* servos, int x, int y)
 	}
 
 	if(p.LENGTH != -1)
-		pulseAServo((void*) &p);
+		launchPulse(&p);
 }
 
 void go(Motor* motors)

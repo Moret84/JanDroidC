@@ -1,4 +1,5 @@
 #include <jandroid.h>
+#include <JandroidStuff.h>
 #include <signal.h>
 
 JandroidStuff jandroid;

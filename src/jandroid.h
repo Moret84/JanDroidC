@@ -2,7 +2,6 @@
 
 #include <Motor.h>
 #include <Servo.h>
-#include <socket.h>
 
 #include <errno.h>
 #include <pthread.h>
@@ -18,21 +17,12 @@
 #define NBSERVO 2
 #define PULSE_WIDTH 20000
 
-typedef struct JandroidStuff JandroidStuff;
-struct JandroidStuff
-{
-	Motor* motors;
-	Servo* servos;
-	Socket socket, client_socket;
-};
-
 enum {AvD, AvG, ArG, ArD};
 enum {horizontal, vertical};
 
 Motor* initMotors(void);
 Servo* initServos(void);
-void pulseAServo(void *args);
-void launchPulse(void *args);
+void launchPulse(Pulse* pulse);
 void moveCamera(Servo* servos, int x, int y);
 void go(Motor* motors);
 void stopAll(Motor* motors);
