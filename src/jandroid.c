@@ -144,7 +144,7 @@ void setMotors(Motor* motors, int x, int y)
 			setBackward(motors);
 
 		int shift = abs(x);
-		int speed = abs(y);
+		int speed = sqrt(x*x + y*y);
 
 		if(x > 0)
 			setSpeed(motors, speed - shift, speed - shift, speed, speed);
